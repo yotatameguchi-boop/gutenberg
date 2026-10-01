@@ -147,6 +147,154 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test.describe( 'link settings popover', () => {
+		const navMenuWithSubmenuFixture = {
+			title: 'Test Navigation Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->' +
+				'<!-- wp:navigation-submenu {"label":"Submenu Item","type":"custom","url":"http://www.wordpress.org/submenu/","kind":"custom"} -->' +
+				'<!-- wp:navigation-link {"label":"Child Item","type":"custom","url":"http://www.wordpress.org/child/","kind":"custom"} /-->' +
+				'<!-- /wp:navigation-submenu -->' +
+				'<!-- wp:navigation-link {"label":"No URL"} /-->',
+		};
+
+		test.beforeEach( async ( { admin, requestUtils } ) => {
+			const createdMenu = await requestUtils.createNavigationMenu(
+				navMenuWithSubmenuFixture
+			);
+
+			await admin.visitSiteEditor( {
+				postId: createdMenu?.id,
+				postType: 'wp_navigation',
+			} );
+		} );
+
+		test( 'opens when selecting a link in the list view', async ( {
+			page,
+		} ) => {
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			await listView
+				.getByRole( 'link', { name: 'Existing Item' } )
+				.click();
+
+			await expect(
+				page.getByRole( 'heading', { name: 'Settings' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'textbox', { name: 'Text' } )
+			).toHaveValue( 'Existing Item' );
+			await expect(
+				page.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'link', { name: 'View' } )
+			).toBeVisible();
+			// Matches the content-only popover: less common fields are
+			// available from the panel menu rather than shown by default.
+			await expect(
+				page.getByRole( 'textbox', { name: 'Description' } )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'textbox', { name: 'Rel attribute' } )
+			).toBeHidden();
+		} );
+
+		test( 'can edit a link label', async ( { page } ) => {
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			await listView
+				.getByRole( 'link', { name: 'Existing Item' } )
+				.click();
+
+			const labelInput = page.getByRole( 'textbox', { name: 'Text' } );
+			await labelInput.fill( 'Changed Label' );
+
+			await expect(
+				listView.getByRole( 'link', { name: 'Changed Label' } )
+			).toBeVisible();
+			await expect(
+				listView.getByRole( 'link', { name: 'Existing Item' } )
+			).toBeHidden();
+		} );
+
+		test( 'can edit a submenu label', async ( { page } ) => {
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			await listView
+				.getByRole( 'link', { name: 'Submenu Item' } )
+				.click();
+
+			const labelInput = page.getByRole( 'textbox', { name: 'Text' } );
+			await expect( labelInput ).toHaveValue( 'Submenu Item' );
+			await labelInput.fill( 'Changed Submenu' );
+
+			await expect(
+				listView.getByRole( 'link', { name: 'Changed Submenu' } )
+			).toBeVisible();
+		} );
+
+		test( 'closes with Escape and returns focus to the list view item', async ( {
+			page,
+		} ) => {
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			const item = listView.getByRole( 'link', {
+				name: 'Existing Item',
+			} );
+
+			await item.click();
+
+			const labelInput = page.getByRole( 'textbox', { name: 'Text' } );
+			await labelInput.focus();
+			await page.keyboard.press( 'Escape' );
+
+			await expect( labelInput ).toBeHidden();
+			await expect( item ).toBeFocused();
+		} );
+
+		test( 'can add a link to an item that has no URL', async ( {
+			page,
+		} ) => {
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+
+			await listView.getByRole( 'link', { name: 'No URL' } ).click();
+
+			await expect(
+				page.getByRole( 'textbox', { name: 'Text' } )
+			).toHaveValue( 'No URL' );
+			// The item is kept; the popover offers to add its link.
+			await expect(
+				listView.getByRole( 'link', { name: 'No URL' } )
+			).toBeVisible();
+			const linkPicker = page.getByRole( 'button', {
+				name: /^Link to/,
+			} );
+			await expect( linkPicker ).toHaveText( /Add link/ );
+			await linkPicker.click();
+			await page.keyboard.type( 'Test Page 1', { delay: 50 } );
+			await page
+				.getByRole( 'listbox', { name: 'Search results' } )
+				.getByRole( 'option', { name: 'Test Page 1' } )
+				.click();
+
+			// The item keeps its label and gains the link.
+			await expect( linkPicker ).toHaveText( /Test Page 1/ );
+			await expect(
+				listView.getByRole( 'link', { name: 'No URL' } )
+			).toBeVisible();
+		} );
+	} );
 } );
 
 class LinkControl {
