@@ -23,8 +23,10 @@ export const Appender = forwardRef(
 
 				const settings = getBlockListSettings( clientId );
 				const directInsertValue = settings?.directInsert || false;
+				const templateLock = getTemplateLock( clientId );
 				const hideInserterValue =
-					!! getTemplateLock( clientId ) || isZoomOut();
+					( !! templateLock && templateLock !== 'contentOnly' ) ||
+					isZoomOut();
 
 				return {
 					directInsert: directInsertValue,
