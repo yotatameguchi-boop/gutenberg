@@ -4,8 +4,33 @@ import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
-import { fontSizeStyles } from '../../input-control/styles/input-control-styles';
+import type { Size } from '../../input-control/types';
 import InputBase from '../../input-control/input-base';
+
+const fontSizeStyles = ( {
+	inputSize: size,
+}: SelectProps & { inputSize?: Size } ) => {
+	const sizes = {
+		default: '13px',
+		small: '11px',
+		compact: '13px',
+	};
+
+	const fontSize = sizes[ size as Size ] || sizes.default;
+	const fontSizeMobile = '16px';
+
+	if ( ! fontSize ) {
+		return '';
+	}
+
+	return css`
+		font-size: ${ fontSizeMobile };
+
+		@media ( min-width: 600px ) {
+			font-size: ${ fontSize };
+		}
+	`;
+};
 
 interface SelectProps extends Pick<
 	SelectControlProps,
