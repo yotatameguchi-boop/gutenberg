@@ -42,6 +42,7 @@
 -   Convert the store defaults, `getBlockSettings` and the store index to TypeScript and type the theme.json settings the store reads ([#84677](https://github.com/WordPress/gutenberg/pull/84677)).
 -   Convert the hook utils, block style state and Global Styles hooks to TypeScript ([#84720](https://github.com/WordPress/gutenberg/pull/84720)).
 -   Convert the block support helpers to TypeScript ([#84721](https://github.com/WordPress/gutenberg/pull/84721)).
+-   Convert the layout helpers and block gap utils to TypeScript ([#84722](https://github.com/WordPress/gutenberg/pull/84722)).
 
 ## 18.1.0 (2026-10-07)
 
