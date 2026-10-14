@@ -5,7 +5,7 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
-    -   `FocalPointPicker`.
+    -   `FocalPointPicker` ([#84736](https://github.com/WordPress/gutenberg/pull/84736)).
     -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
     -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
     -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
@@ -31,7 +31,7 @@
 
 ### Bug Fixes
 
--   `StyleProvider`: Register module styles before children measure layout in iframe documents.
+-   `StyleProvider`: Register module styles before children measure layout in iframe documents ([#84736](https://github.com/WordPress/gutenberg/pull/84736)).
 
 -   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
 -   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
